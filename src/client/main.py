@@ -58,7 +58,7 @@ def remote_whisper(input_file_path):
             language = response.headers.get("X-Language")
             log_response(response, round(total_time, 3))
             output_file_path = get_path("audio_files", "output.mp3")
-            with open(input_file_path, "wb") as f:
+            with open(output_file_path, "wb") as f:
                 f.write(response.content)
             return output_file_path, language
         else:
