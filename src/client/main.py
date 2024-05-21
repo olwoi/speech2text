@@ -8,21 +8,24 @@ from subprocess import run, CalledProcessError
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-SERVER_URL = "http://0.0.0.0:8006/whisper"
+SERVER_URL = "http://localhost:8006/whisper/"
+
 
 def get_path(dir_name, file_name):
     return path.join(path.dirname(path.abspath(__file__)), dir_name, file_name)
+
 
 def log_response(response, total):
     whisper = round(float(response.headers.get("Time-Whisper")), 3)
     tts = round(float(response.headers.get("Time-TTS")), 3)
     logging.info(f"Total delay of {total}s: Whisper took {whisper}s and TTS took {tts}s")
 
+
 def play_audio(audio_path):
     """
     This function is supposed to play audio given a path, but has only been tested on Raspbian, Darwin and Windows.
     """
-    if audio_path == None:
+    if audio_path is None:
         logging.error("Error in play_audio: No audio path provided")
 
     os_name = system()
@@ -44,6 +47,7 @@ def play_audio(audio_path):
     else:
         raise OSError(f"Unsupported operation system: {os_name}")
 
+
 def remote_whisper(input_file_path):
     """
     sends local audio file to server, saves response and returns its location.
@@ -58,6 +62,7 @@ def remote_whisper(input_file_path):
             language = response.headers.get("X-Language")
             log_response(response, round(total_time, 3))
             output_file_path = get_path("audio_files", "output.mp3")
+            print("Pfad:" + output_file_path)
             with open(output_file_path, "wb") as f:
                 f.write(response.content)
             return output_file_path, language
@@ -67,6 +72,7 @@ def remote_whisper(input_file_path):
     except Exception as e:
         logging.error(f"Error prompting server: {e}")
         return None, None
+
 
 if __name__ == "__main__":
     # currently just takes a local input.mp3 and plays response (output.mp3)
